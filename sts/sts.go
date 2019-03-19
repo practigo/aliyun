@@ -11,7 +11,7 @@ import (
 
 // API constants
 const (
-	Host = "https://sts.aliyuncs.com/"
+	Host = "https://sts.aliyuncs.com/" // public domain
 	Ver  = "2015-04-01"
 )
 
@@ -36,6 +36,14 @@ type AssumeRoleResponse struct {
 	Cred      Credentials     `json:"Credentials"`
 }
 
+// AssumeRoleParam is the param for AssumeRole.
+type AssumeRoleParam struct {
+	RoleArn         string
+	RoleSessionName string
+	Policy          string
+	UID             string
+}
+
 // api provides the common methods for a STS API.
 // It implements the aliyun.API interface.
 type api struct {
@@ -47,7 +55,7 @@ func (api) Version() string {
 }
 
 func (api) Nonce() string {
-	// TODO: Nonce can be the same when retry
+	// Nonce can be the same when retry
 	return aliyun.Nonce(32)
 }
 
@@ -59,24 +67,67 @@ func (a *api) Param() url.Values {
 	return a.v
 }
 
-func getRoleArn(uid string, role string) string {
-	return "acs:ram::" + uid + ":role/" + role
+// GetRoleArn composes the roleArn parameter;
+// it must be of the form "acs:ram::$accountID:role/$roleName".
+func GetRoleArn(uid, roleName string) string {
+	return "acs:ram::" + uid + ":role/" + roleName
 }
 
-// AssumeRole gets a temporary role.
+// AssumeRoleAPI forms the API for AssumeRole.
 // doc https://help.aliyun.com/document_detail/28763.html
-func AssumeRole(s aliyun.Signer, uid, role, sessionName, policy string, dur uint64) (resp AssumeRoleResponse, err error) {
+func AssumeRoleAPI(r *AssumeRoleParam, dur int64) aliyun.API {
 	a := &api{v: url.Values{}}
-	// api-specific
+
+	// api-specific mandotory params
 	a.v.Add("Action", "AssumeRole")
-	a.v.Add("RoleArn", getRoleArn(uid, role))
-	a.v.Add("RoleSessionName", sessionName)
-	a.v.Add("DurationSeconds", strconv.FormatUint(dur, 10))
-	if policy != "" {
-		a.v.Add("Policy", policy)
+	a.v.Add("RoleArn", r.RoleArn)
+	a.v.Add("RoleSessionName", r.RoleSessionName)
+
+	// optional
+	if r.Policy != "" {
+		a.v.Add("Policy", r.Policy)
 	}
-	// request
-	url := Host + "?" + s.Sign(a)
-	err = aliyun.Get(url, &resp)
+	if dur > 900 && dur < 3600 {
+		// default (and max) 3600
+		a.v.Add("DurationSeconds", strconv.FormatInt(dur, 10))
+	}
+
+	return a
+}
+
+// Getter gets the credentials.
+type Getter interface {
+	// Get gets the credentials using the param.
+	// The returned credentials should not expire before
+	// specified duration (in seconds).
+	Get(*AssumeRoleParam, int64) (Credentials, error)
+}
+
+type getter struct {
+	s    aliyun.Signer
+	host string
+	cl   *http.Client
+}
+
+func (g *getter) Get(r *AssumeRoleParam, dur int64) (cred Credentials, err error) {
+	api := AssumeRoleAPI(r, dur)
+	var resp AssumeRoleResponse
+	if err = aliyun.Get(g.cl, g.s, api, g.host, &resp); err != nil {
+		return
+	}
+	cred = resp.Cred
 	return
+}
+
+// New returns a Getter for requesting credentials from host
+// with the provided Signer. The underlying http.Client is
+// set to have a 5s timeout.
+func New(s aliyun.Signer, host string) Getter {
+	return &getter{
+		s:    s,
+		host: host,
+		cl: &http.Client{
+			Timeout: 5 * time.Second,
+		},
+	}
 }

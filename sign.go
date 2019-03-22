@@ -88,9 +88,8 @@ func NewSigner(id, secret string) Signer {
 	}
 }
 
-// Nonce returns a random string with given length
-// as a out-of-box nonce-gernerator.
-func Nonce(n int) string {
+// RandString returns a random string with given length.
+func RandString(n int) string {
 	b := make([]byte, n/2)
 	rand.Read(b)
 	return fmt.Sprintf("%x", b)

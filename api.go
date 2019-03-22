@@ -1,6 +1,7 @@
 package aliyun
 
 import (
+	"net/http"
 	"net/url"
 	"time"
 )
@@ -18,7 +19,8 @@ func FormatT(t time.Time) string {
 }
 
 // API abstracts the unique parts of a Aliyun API.
-// It's all protected by the request signature.
+// It is supposed to be used for a single request.
+// All the params are guarded by the signature.
 type API interface {
 	// Param returns the API specific parameters.
 	// These will combine with the common param to get a signature.
@@ -33,6 +35,19 @@ type API interface {
 	// Method returns the HTTP method the API used to
 	// make the request.
 	Method() string
+}
+
+// Base implements parts for the API as default.
+type Base struct{}
+
+// Nonce returns a random 32 bytes string.
+func (Base) Nonce() string {
+	return RandString(32)
+}
+
+// Method returns GET (the most common method).
+func (Base) Method() string {
+	return http.MethodGet
 }
 
 // OSS defines a unique OSS resource.

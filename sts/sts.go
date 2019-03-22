@@ -12,7 +12,7 @@ import (
 // API constants
 const (
 	Host = "https://sts.aliyuncs.com/" // public domain
-	Ver  = "2015-04-01"
+	Ver  = "2015-04-01"                // API version
 )
 
 // A Credentials is the credentials obtained by AssumedRole.
@@ -48,19 +48,12 @@ type AssumeRoleParam struct {
 // It implements the aliyun.API interface.
 type api struct {
 	v url.Values
+	// embedded
+	aliyun.Base
 }
 
 func (api) Version() string {
 	return Ver
-}
-
-func (api) Nonce() string {
-	// Nonce can be the same when retry
-	return aliyun.Nonce(32)
-}
-
-func (api) Method() string {
-	return http.MethodGet
 }
 
 func (a *api) Param() url.Values {

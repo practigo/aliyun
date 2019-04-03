@@ -1,16 +1,20 @@
 package aliyun
 
-import "fmt"
+import (
+	"encoding/xml"
+	"fmt"
+)
 
 // CanonicalizedError defines the common request response
 // if any error occurs.
 // It also implements the error interface.
 type CanonicalizedError struct {
-	Code      string `json:"Code,omitempty"`
-	Message   string `json:"Message,omitempty"`
-	RequestID string `json:"RequestId,omitempty"`
-	HostID    string `json:"HostId,omitempty"`
-	Status    int    `json:"status,omitempty"` // from HTTP
+	XMLName   xml.Name `json:"-" xml:"Error"`
+	Code      string   `json:"Code,omitempty" xml:"Code,omitempty"`
+	Message   string   `json:"Message,omitempty" xml:"Message,omitempty"`
+	RequestID string   `json:"RequestId,omitempty" xml:"RequestId,omitempty"`
+	HostID    string   `json:"HostId,omitempty" xml:"HostId,omitempty"`
+	Status    int      `json:"status,omitempty"` // from HTTP
 }
 
 func (ce *CanonicalizedError) Error() string {

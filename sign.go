@@ -66,7 +66,7 @@ func (s *signer) Sign(a API) string {
 
 	// generate signature
 	h := hmac.New(sha1.New, []byte(s.secret+"&"))
-	h.Write([]byte(toSign))
+	h.Write([]byte(toSign)) // sha1 Write() returns no error
 	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
 
 	// final query

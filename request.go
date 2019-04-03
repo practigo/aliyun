@@ -6,12 +6,13 @@ import (
 	"net/http"
 )
 
-// HandleResp reads the HTTP response and checks if any error returned.
-// If any error other than io/json error returned, it should be a
-// CanonicalizedError. The body is unmarshaled to the provided interface v
-// if the request succeeds.
-func HandleResp(r *http.Response, v interface{}) (err error) {
-	bs, err := ioutil.ReadAll(r.Body)
+// HandleResp reads the raw HTTP response and checks if
+// any error returned. Errors other than io/json error
+// should be a CanonicalizedError. The body is unmarshaled
+// to the provided interface resp if the request succeeds.
+// It is the caller's responsiblity to close the body.
+func HandleResp(raw *http.Response, resp interface{}) (err error) {
+	bs, err := ioutil.ReadAll(raw.Body)
 	if err != nil {
 		return
 	}
@@ -23,13 +24,13 @@ func HandleResp(r *http.Response, v interface{}) (err error) {
 		return
 	}
 
-	ce.Status = r.StatusCode
+	ce.Status = raw.StatusCode
 
 	if ce.Code != "" { // if there's an error, there should be a code
 		return &ce
 	}
 
-	err = json.Unmarshal(bs, v)
+	err = json.Unmarshal(bs, resp)
 	return
 }
 

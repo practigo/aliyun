@@ -13,14 +13,15 @@ const (
 	TimeFormat = "2006-01-02T15:04:05Z" // official UTC time format
 )
 
-// FormatT converts a Time to Aliyun format time string.
+// FormatT converts a Time to Aliyun format time string,
+// e.g., 2006-01-02T15:04:05Z.
 func FormatT(t time.Time) string {
 	return t.UTC().Format(TimeFormat)
 }
 
-// API abstracts the unique parts of a Aliyun API.
-// It is supposed to be used for a single request.
-// All the params are guarded by the signature.
+// An API abstracts the unique parts of an Aliyun API
+// for a single request. The Signer then signs the API
+// to protect against different attacks.
 type API interface {
 	// Param returns the API specific parameters.
 	// These will combine with the common param to get a signature.
@@ -37,7 +38,8 @@ type API interface {
 	Method() string
 }
 
-// Base implements parts for the API as default.
+// Base implements parts for the API with a 32 bytes
+// string nonce and HTTP GET method.
 type Base struct{}
 
 // Nonce returns a random 32 bytes string.
@@ -50,7 +52,7 @@ func (Base) Method() string {
 	return http.MethodGet
 }
 
-// OSS defines a unique OSS resource.
+// An OSS defines a unique OSS resource.
 // OSS is the fundamental service used by
 // most other services.
 type OSS struct {

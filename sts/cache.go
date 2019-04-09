@@ -5,11 +5,10 @@ import (
 	"time"
 )
 
-// KeyFunc maps the param to a key string.
+// A KeyFunc maps the param to a key string.
 type KeyFunc func(*AssumeRoleParam) string
 
-// cache implements Getter but caches the credentials
-// to avoid repeating requests.
+// A cache caches the credentials to descrease requests.
 type cache struct {
 	g Getter
 	k KeyFunc

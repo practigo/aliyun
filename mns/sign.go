@@ -9,10 +9,21 @@ import (
 	"strings"
 )
 
-// Signer signs the MNS API.
+// A Signer signs the MNS API.
 type Signer interface {
 	// Sign returns a Authorization string for the specified API
-	// HTTP method, request resource and headers.
+	// HTTP method, request resource and headers, as described in
+	// https://help.aliyun.com/document_detail/27487.html.
+	//
+	// The return string is in the form of:
+	// Authorization: MNS AccessKeyId:Signature
+	//
+	// Signature = base64(hmac-sha1(HTTP_METHOD + "\n"
+	// + CONTENT-MD5 + "\n"
+	// + CONTENT-TYPE + "\n"
+	// + DATE + "\n"
+	// + CanonicalizedMNSHeaders
+	// + CanonicalizedResource))
 	Sign(method, resource string, headers map[string]string) string
 }
 
@@ -29,16 +40,6 @@ func NewSigner(key, secret string) Signer {
 	}
 }
 
-// Sign signs the API, as described in
-// https://help.aliyun.com/document_detail/27487.html.
-//
-// Authorization: MNS AccessKeyId:Signature
-// Signature = base64(hmac-sha1(HTTP_METHOD + "\n"
-// + CONTENT-MD5 + "\n"
-// + CONTENT-TYPE + "\n"
-// + DATE + "\n"
-// + CanonicalizedMNSHeaders
-// + CanonicalizedResource))
 func (a *signer) Sign(method, resource string, headers map[string]string) string {
 	// CanonicalizedMNSHeaders
 	mnsHeaders := []string{}

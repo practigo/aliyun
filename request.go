@@ -10,7 +10,7 @@ import (
 // any error returned. Errors other than io/json error
 // should be a CanonicalizedError. The body is unmarshaled
 // to the provided interface resp if the request succeeds.
-// It is the caller's responsiblity to close the body.
+// It is the caller's responsibility to close the body.
 func HandleResp(raw *http.Response, resp interface{}) (err error) {
 	bs, err := ioutil.ReadAll(raw.Body)
 	if err != nil {

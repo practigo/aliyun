@@ -10,26 +10,13 @@ import (
 	"time"
 )
 
-// Signer signs an API.
+// A Signer signs the APIs.
 type Signer interface {
 	// Sign signs the API according to the Aliyun specification:
 	// https://help.aliyun.com/document_detail/50284.html &
 	// https://help.aliyun.com/document_detail/50286.html.
-	//
-	// Version	String	是	API 版本号。
-	// 		格式：YYYY-MM-DD。
-	// 		本版本对应为 2016-11-01。
-	// AccessKeyId	String	是	阿里云颁发给用户的访问服务所用的密钥 ID。
-	// Signature	String	是	签名结果串。关于签名的计算方法，参见 签名机制。
-	// SignatureMethod	String	是	签名方式，目前支持 HMAC-SHA1。
-	// Timestamp	String	是	请求的时间戳。
-	// 		日期格式按照 ISO8601 标准表示，并需要使用 UTC 时间。
-	// 		格式：YYYY-MM-DDThh:mm:ssZ。
-	// 		例如：2014-05-26T12:00:00Z（为北京时间 2014 年 5 月 26 日 20 点 0 分 0 秒）。
-	// SignatureVersion	String	是	签名算法版本。目前版本是 1.0。
-	// SignatureNonce	String	是	唯一随机数，用于防止网络重放攻击。用户在不同请求间要使用不同的随机数值。
-	// ResourceOwnerAccount	String	否	本次 API 请求访问到的资源拥有者账户，即登录用户名。 此参数的使用方法，参见 RAM资源授权。（只能在 RAM 中可对 live 资源进行授权的 Action 中才能使用此参数，否则访问会被拒绝。）
-	// Format	String	否	返回值的类型，支持 JSON 与 XML。默认值：XML
+	// It returns the query part of the request including
+	// the signature.
 	Sign(API) string
 }
 
@@ -76,8 +63,8 @@ func (s *signer) Sign(a API) string {
 	// return v.Encode()
 }
 
-// NewSigner returns a Signer to sign the API.
-// It is fixed to use the JSON format.
+// NewSigner returns a Signer to sign the APIs
+// using the JSON format.
 func NewSigner(id, secret string) Signer {
 	return &signer{
 		id:     id,
@@ -88,7 +75,8 @@ func NewSigner(id, secret string) Signer {
 	}
 }
 
-// RandString returns a random string with given length.
+// RandString returns a random string with the given
+// length n.
 func RandString(n int) string {
 	b := make([]byte, n/2)
 	rand.Read(b)

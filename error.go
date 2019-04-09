@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// CanonicalizedError defines the common request response
+// A CanonicalizedError defines the common request response
 // if any error occurs.
 // It also implements the error interface.
 type CanonicalizedError struct {

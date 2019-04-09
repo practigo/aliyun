@@ -37,7 +37,7 @@ func CreateRecordAPI(uri StreamURI, start, end time.Time, oss aliyun.OSS) aliyun
 	return a
 }
 
-// RecordInfo represents the a live stream record.
+// A RecordInfo represents the a live stream record.
 type RecordInfo struct {
 	RecordID  string `json:"RecordId"`
 	RecordURL string `json:"RecordUrl"`
@@ -54,7 +54,7 @@ type RecordInfo struct {
 	aliyun.OSS
 }
 
-// DescribeRecordsResponse is the response for
+// A DescribeRecordsResponse is the response for
 // DescribeLiveStreamRecordIndexFiles.
 type DescribeRecordsResponse struct {
 	List struct {
@@ -63,7 +63,7 @@ type DescribeRecordsResponse struct {
 	RequestID string `json:"RequestId"`
 }
 
-// CreateRecordResponse is the response for
+// A CreateRecordResponse is the response for
 // CreateLiveStreamRecordIndexFiles.
 type CreateRecordResponse struct {
 	Info      RecordInfo `json:"RecordInfo"`

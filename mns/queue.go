@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// SendMessageRequest is the request body for API
+// A SendMessageRequest is the request body for API
 // SendMessage. Note that the MessageBody is raw
 // []byte here. Whether using base64 encoding as
 // other SDKs do is up to the users. See
@@ -20,7 +20,7 @@ type SendMessageRequest struct {
 	Priority     int32    `xml:"Priority,omitempty"`
 }
 
-// SendMessageResponse is the response body for API
+// A SendMessageResponse is the response body for API
 // SendMessage.
 type SendMessageResponse struct {
 	XMLName        xml.Name `xml:"Message" json:"-"`
@@ -29,7 +29,7 @@ type SendMessageResponse struct {
 	ReceiptHandle  string   `xml:"ReceiptHandle,omitempty" json:"receipt_handle,omitempty"`
 }
 
-// ReceiveMessageResponse is the response body for
+// A ReceiveMessageResponse is the response body for
 // API ReceiveMessage.
 type ReceiveMessageResponse struct {
 	XMLName          xml.Name `xml:"Message" json:"-"`
@@ -81,7 +81,7 @@ func Encode2Base64(src []byte) []byte {
 	return buf
 }
 
-// Messager provides operations on the messages on
+// A Messager provides operations on the messages on
 // queues of a certain host.
 type Messager struct {
 	s      Signer
@@ -127,7 +127,8 @@ func (m *Messager) Delete(queue string, receipt string) error {
 }
 
 // NewMessager returns a *Messager with the underlying
-// http.Clients set.
+// http.Clients set to 35s for long-polling receiving
+// and 5s for other requests.
 func NewMessager(s Signer, host string) *Messager {
 	return &Messager{
 		s:    s,

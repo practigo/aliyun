@@ -12,8 +12,7 @@ const (
 	Ver  = "2016-11-01"
 )
 
-// api provides the common methods for a Live API.
-// It implements part of the aliyun.API interface.
+// An api provides the common parts for a Live API.
 type api struct {
 	v url.Values
 	aliyun.Base
@@ -27,7 +26,8 @@ func (a *api) Param() url.Values {
 	return a.v
 }
 
-// StreamURI defines rtmp://{Domain}/{App}/{Stream}
+// A StreamURI defines a RTMP stream,
+// e.g., rtmp://{Domain}/{App}/{Stream}.
 type StreamURI struct {
 	Domain string `json:"DomainName"`
 	App    string `json:"AppName"`

@@ -29,7 +29,7 @@ func readAndUnmarshalBody(body io.Reader, v interface{}) error {
 // should be a CanonicalizedError. The body is unmarshaled
 // to the provided interface resp if the request succeeds
 // and resp is not nil.
-// It is the caller's responsiblity to close the body.
+// It is the caller's responsibility to close the body.
 func HandleResp(raw *http.Response, resp interface{}) (err error) {
 	status := raw.StatusCode
 

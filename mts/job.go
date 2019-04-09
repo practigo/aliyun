@@ -16,8 +16,7 @@ const (
 	Ver = "2014-06-18"
 )
 
-// api provides the common methods for a MTS API.
-// It implements the aliyun.API interface.
+// An api provides the common parts for a MTS API.
 type api struct {
 	v url.Values
 	aliyun.Base
@@ -31,7 +30,7 @@ func (a *api) Param() url.Values {
 	return a.v
 }
 
-// SubmitJobsRequest contains the param for submitting a
+// A SubmitJobsRequest contains the param for submitting a
 // transcoding job. Only the OutputLocation is optional
 // and default to "oss-cn-hangzhou".
 type SubmitJobsRequest struct {
@@ -77,9 +76,9 @@ func QueryJobsAPI(id string, rest ...string) aliyun.API {
 	return a
 }
 
-// JobInfo represents the info for one job.
-// The watermark & properties are too much so
-// it's marshalled to raw bytes.
+// A JobInfo represents the info for one job.
+// The WaterMarkList & Properties have too many
+// fields so it's marshalled to raw bytes.
 type JobInfo struct {
 	JobID string `json:"JobId"`
 	Input struct {
@@ -106,7 +105,7 @@ type JobInfo struct {
 	CreationTime time.Time `json:"CreationTime"`
 }
 
-// JobResult gives the result of a job.
+// A JobResult gives the result of a job.
 type JobResult struct {
 	Success bool    `json:"Success"`
 	Code    string  `json:"Code"`
@@ -114,7 +113,7 @@ type JobResult struct {
 	Job     JobInfo `json:"Job"`
 }
 
-// SubmitJobsResponse contains the response for SubmitJobs.
+// A SubmitJobsResponse contains the response for SubmitJobs.
 type SubmitJobsResponse struct {
 	RequestID string `json:"RequestId"`
 	List      struct {
@@ -122,7 +121,7 @@ type SubmitJobsResponse struct {
 	} `json:"JobResultList"`
 }
 
-// QueryJobsResponse contains the response for QueryJobList.
+// A QueryJobsResponse contains the response for QueryJobList.
 type QueryJobsResponse struct {
 	NonExistJobIDs struct {
 		IDs []string `json:"String,omitempty"`
@@ -133,17 +132,17 @@ type QueryJobsResponse struct {
 	} `json:"JobList"`
 }
 
-// Submitter submits a transcoding job.
+// A Submitter submits a transcoding job.
 type Submitter interface {
 	Submit(*SubmitJobsRequest) (SubmitJobsResponse, error)
 }
 
-// Querier queries a transcoding job.
+// A Querier queries a transcoding job.
 type Querier interface {
 	Query(id string, rest ...string) (QueryJobsResponse, error)
 }
 
-// Transcoder wraps a Submitter & a Querier.
+// A Transcoder wraps a Submitter & a Querier.
 type Transcoder interface {
 	Submitter
 	Querier
@@ -167,7 +166,8 @@ func (s *transcoder) Query(id string, rest ...string) (resp QueryJobsResponse, e
 	return
 }
 
-// New returns a new Transcoder.
+// New returns a new Transcoder with a 10s-timeout
+// HTTP client.
 func New(s aliyun.Signer, host string) Transcoder {
 	return &transcoder{
 		signer: s,

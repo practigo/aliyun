@@ -36,7 +36,7 @@ type AssumeRoleResponse struct {
 	Cred      Credentials     `json:"Credentials"`
 }
 
-// AssumeRoleParam is the param for AssumeRole.
+// An AssumeRoleParam is the param for AssumeRole.
 type AssumeRoleParam struct {
 	RoleArn         string
 	RoleSessionName string
@@ -44,8 +44,7 @@ type AssumeRoleParam struct {
 	UID             string
 }
 
-// api provides the common methods for a STS API.
-// It implements the aliyun.API interface.
+// An api provides the common parts for a STS API.
 type api struct {
 	v url.Values
 	// embedded
@@ -88,7 +87,7 @@ func AssumeRoleAPI(r *AssumeRoleParam, dur int64) aliyun.API {
 	return a
 }
 
-// Getter gets the credentials.
+// A Getter gets the STS credentials.
 type Getter interface {
 	// Get gets the credentials using the param.
 	// The returned credentials should not expire before

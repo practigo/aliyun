@@ -1,6 +1,7 @@
 # Go SDK for [Aliyun](https://www.aliyun.com)
 
 [![GoDoc](https://godoc.org/github.com/practigo/aliyun?status.svg)](https://godoc.org/github.com/practigo/aliyun)
+[![Go Report Card](https://goreportcard.com/badge/github.com/practigo/aliyun)](https://goreportcard.com/report/github.com/practigo/aliyun)
 
 This is not a typical SDK as it won't try to provide all APIs. 
 

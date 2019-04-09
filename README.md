@@ -28,6 +28,24 @@ Other repo: https://github.com/BPing/aliyun-live-go-sdk
 
 https://github.com/aliyun/aliyun-oss-go-sdk is good enough.
 
+### MNS
+
+- Different Restful APIs and authorization
+- Queue & Messages
+
+## Usage
+
+The typical usage is:
+
+```go
+s := aliyun.NewSigner("id", "secret")
+api := YourImplementedAPI{}
+url := "host" + ? + s.Sign(api)
+rawResponse, err := http.Get(url) // http level error if any
+var resp APIResponseType
+err = HandleResp(rawResponse, &resp) // return a CanonicalizedError if any
+```
+
 ## License
 
 MIT

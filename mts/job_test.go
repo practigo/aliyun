@@ -32,7 +32,7 @@ func TestTranscoder(t *testing.T) {
 		t.Skip("Must set env vars", requiredVars)
 	}
 
-	s := aliyun.NewSigner(testEnvs["MTS_KEY_ID"], testEnvs["MTS_KEY_SECRET"])
+	s := aliyun.NewAccessKey(testEnvs["MTS_KEY_ID"], testEnvs["MTS_KEY_SECRET"])
 	submitter := mts.New(s, testEnvs["MTS_ENDPOINT"])
 
 	// CHANGE the request to make it non-error.

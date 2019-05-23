@@ -20,7 +20,9 @@ type Signer interface {
 	Sign(API) string
 }
 
-type signer struct {
+// AccessKey is an id-secret pair obtained from Aliyun to
+// access the resources (sign the requests).
+type AccessKey struct {
 	// user specific
 	id, secret string
 	// internal, so far fixed
@@ -29,7 +31,8 @@ type signer struct {
 	format string
 }
 
-func (s *signer) Sign(a API) string {
+// Sign signs the API.
+func (s *AccessKey) Sign(a API) string {
 	// API specific param
 	v := a.Param()
 
@@ -63,10 +66,15 @@ func (s *signer) Sign(a API) string {
 	// return v.Encode()
 }
 
-// NewSigner returns a Signer to sign the APIs
+// ID returns the access ID.
+func (s *AccessKey) ID() string {
+	return s.id
+}
+
+// NewAccessKey returns a AccessKey to sign the APIs
 // using the JSON format.
-func NewSigner(id, secret string) Signer {
-	return &signer{
+func NewAccessKey(id, secret string) *AccessKey {
+	return &AccessKey{
 		id:     id,
 		secret: secret,
 		ver:    "1.0",

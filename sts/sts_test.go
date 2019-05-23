@@ -31,7 +31,7 @@ func TestAssumeRole(t *testing.T) {
 		t.Skip("Must set env vars", requiredVars)
 	}
 
-	s := aliyun.NewSigner(testEnvs["STS_KEY_ID"], testEnvs["STS_KEY_SECRET"])
+	s := aliyun.NewAccessKey(testEnvs["STS_KEY_ID"], testEnvs["STS_KEY_SECRET"])
 	role := sts.GetRoleArn(testEnvs["STS_UID"], testEnvs["STS_ROLE"])
 	param := sts.AssumeRoleParam{
 		RoleArn:         role,
@@ -59,7 +59,7 @@ func TestCache(t *testing.T) {
 		t.Skip("Must set env vars", requiredVars)
 	}
 
-	s := aliyun.NewSigner(testEnvs["STS_KEY_ID"], testEnvs["STS_KEY_SECRET"])
+	s := aliyun.NewAccessKey(testEnvs["STS_KEY_ID"], testEnvs["STS_KEY_SECRET"])
 	role := sts.GetRoleArn(testEnvs["STS_UID"], testEnvs["STS_ROLE"])
 	param := sts.AssumeRoleParam{
 		RoleArn:         role,

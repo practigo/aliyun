@@ -27,20 +27,22 @@ type Signer interface {
 	Sign(method, resource string, headers map[string]string) string
 }
 
-type signer struct {
-	key    string
+// AK is the access key.
+type AK struct {
+	id     string
 	secret string
 }
 
-// NewSigner returns a Signer to sign the MNS APIs.
-func NewSigner(key, secret string) Signer {
-	return &signer{
-		key:    key,
+// NewAK returns an AK to sign the MNS APIs.
+func NewAK(id, secret string) *AK {
+	return &AK{
+		id:     id,
 		secret: secret,
 	}
 }
 
-func (a *signer) Sign(method, resource string, headers map[string]string) string {
+// Sign returns the Authorization string.
+func (a *AK) Sign(method, resource string, headers map[string]string) string {
 	// CanonicalizedMNSHeaders
 	mnsHeaders := []string{}
 	for k, v := range headers {
@@ -61,5 +63,5 @@ func (a *signer) Sign(method, resource string, headers map[string]string) string
 	h.Write([]byte(toSign)) // no error here
 
 	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
-	return fmt.Sprintf("MNS %s:%s", a.key, signature)
+	return fmt.Sprintf("MNS %s:%s", a.id, signature)
 }

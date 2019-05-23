@@ -16,8 +16,8 @@ import (
 type SendMessageRequest struct {
 	XMLName      xml.Name `xml:"Message"`
 	MessageBody  []byte   `xml:"MessageBody"`
-	DelaySeconds int32    `xml:"DelaySeconds,omitempty"`
-	Priority     int32    `xml:"Priority,omitempty"`
+	DelaySeconds int    `xml:"DelaySeconds,omitempty"`
+	Priority     int    `xml:"Priority,omitempty"`
 }
 
 // A SendMessageResponse is the response body for API
@@ -40,8 +40,8 @@ type ReceiveMessageResponse struct {
 	EnqueueTime      int64    `xml:"EnqueueTime" json:"enqueue_time"`
 	NextVisibleTime  int64    `xml:"NextVisibleTime" json:"next_visible_time"`
 	FirstDequeueTime int64    `xml:"FirstDequeueTime" json:"first_dequeue_time"`
-	DequeueCount     int32    `xml:"DequeueCount" json:"dequeue_count"`
-	Priority         int32    `xml:"Priority" json:"priority"`
+	DequeueCount     int    `xml:"DequeueCount" json:"dequeue_count"`
+	Priority         int   `xml:"Priority" json:"priority"`
 }
 
 // queue constants
@@ -68,10 +68,7 @@ const (
 	queueMsgPath = "/queues/%s/messages"
 
 	// URL queries
-	receiveWaitParam = "waitseconds"
-	batchNumParam    = "numOfMessages"
-	visibilityParam  = "visibilityTimeout"
-	peekonlyParam    = "peekonly=true"
+	batchNumParam = "numOfMessages"
 )
 
 // Encode2Base64 encodes the src bytes to base64 bytes.
@@ -102,26 +99,49 @@ func (m *Messager) Send(queue string, msg *SendMessageRequest) (resp SendMessage
 	return
 }
 
-// Receive receives a message from the queue. See
+// Receive receives a message from the queue. If waitSeconds > 0
+// then the long-polling is triggered. See
 // https://help.aliyun.com/document_detail/35136.html.
-func (m *Messager) Receive(queue string, wait int) (resp ReceiveMessageResponse, err error) {
+func (m *Messager) Receive(queue string, waitSeconds int) (resp ReceiveMessageResponse, err error) {
 	a := &API{
 		Method:   http.MethodGet,
 		Resource: fmt.Sprintf(queueMsgPath, queue),
 	}
-	if wait > 0 {
-		a.Resource += fmt.Sprintf("?%s=%d", receiveWaitParam, wait)
+	if waitSeconds > 0 {
+		a.Resource += fmt.Sprintf("?waitseconds=%d", waitSeconds)
 	}
 	err = Req(m.poller, m.s, m.host, a, &resp)
 	return
 }
 
-// Delete deletes a message from the queue. See
+// Peek receives a message without setting it inactive. See
+// https://help.aliyun.com/document_detail/35140.html.
+func (m *Messager) Peek(queue string) (resp ReceiveMessageResponse, err error) {
+	a := &API{
+		Method:   http.MethodGet,
+		Resource: fmt.Sprintf(queueMsgPath, queue) + "?peekonly=true",
+	}
+	err = Req(m.poller, m.s, m.host, a, &resp)
+	return
+}
+
+// Delete deletes a message from the queue specified by the receipt. See
 // https://help.aliyun.com/document_detail/35138.html.
-func (m *Messager) Delete(queue string, receipt string) error {
+func (m *Messager) Delete(queue, receipt string) error {
 	a := &API{
 		Method:   http.MethodDelete,
 		Resource: fmt.Sprintf(queueMsgPath+"?ReceiptHandle=%s", queue, receipt),
+	}
+	return Req(m.cl, m.s, m.host, a, nil)
+}
+
+// Change changes a message's visibility timeout (in second). See
+// https://help.aliyun.com/document_detail/35142.html.
+func (m *Messager) Change(queue, receipt string, timeout int) error {
+	a := &API{
+		Method: http.MethodPut,
+		Resource: fmt.Sprintf(queueMsgPath+"?ReceiptHandle=%s&visibilityTimeout=%d",
+			queue, receipt, timeout),
 	}
 	return Req(m.cl, m.s, m.host, a, nil)
 }

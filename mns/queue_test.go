@@ -18,7 +18,7 @@ var (
 )
 
 func TestMessager(t *testing.T) {
-	s := mns.NewSigner(testID, testSecret)
+	s := mns.NewAK(testID, testSecret)
 	messager := mns.NewMessager(s, testEndpoint)
 
 	// send

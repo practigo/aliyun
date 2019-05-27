@@ -16,8 +16,8 @@ import (
 type SendMessageRequest struct {
 	XMLName      xml.Name `xml:"Message"`
 	MessageBody  []byte   `xml:"MessageBody"`
-	DelaySeconds int    `xml:"DelaySeconds,omitempty"`
-	Priority     int    `xml:"Priority,omitempty"`
+	DelaySeconds int      `xml:"DelaySeconds,omitempty"`
+	Priority     int      `xml:"Priority,omitempty"`
 }
 
 // A SendMessageResponse is the response body for API
@@ -40,8 +40,8 @@ type ReceiveMessageResponse struct {
 	EnqueueTime      int64    `xml:"EnqueueTime" json:"enqueue_time"`
 	NextVisibleTime  int64    `xml:"NextVisibleTime" json:"next_visible_time"`
 	FirstDequeueTime int64    `xml:"FirstDequeueTime" json:"first_dequeue_time"`
-	DequeueCount     int    `xml:"DequeueCount" json:"dequeue_count"`
-	Priority         int   `xml:"Priority" json:"priority"`
+	DequeueCount     int      `xml:"DequeueCount" json:"dequeue_count"`
+	Priority         int      `xml:"Priority" json:"priority"`
 }
 
 // queue constants

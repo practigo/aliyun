@@ -44,6 +44,14 @@ type ReceiveMessageResponse struct {
 	Priority         int      `xml:"Priority" json:"priority"`
 }
 
+// A ChangeMessageVisibilityResponse is the response body for
+// API ChangeMessageVisibility.
+type ChangeMessageVisibilityResponse struct {
+	XMLName         xml.Name `xml:"Message" json:"-"`
+	ReceiptHandle   string   `xml:"ReceiptHandle" json:"receipt_handle"`
+	NextVisibleTime int64    `xml:"NextVisibleTime" json:"next_visible_time"`
+}
+
 // queue constants
 const (
 	// SendMessage
@@ -137,13 +145,14 @@ func (m *Messager) Delete(queue, receipt string) error {
 
 // Change changes a message's visibility timeout (in second). See
 // https://help.aliyun.com/document_detail/35142.html.
-func (m *Messager) Change(queue, receipt string, timeout int) error {
+func (m *Messager) Change(queue, receipt string, timeout int) (resp ChangeMessageVisibilityResponse, err error) {
 	a := &API{
 		Method: http.MethodPut,
 		Resource: fmt.Sprintf(queueMsgPath+"?ReceiptHandle=%s&visibilityTimeout=%d",
 			queue, receipt, timeout),
 	}
-	return Req(m.cl, m.s, m.host, a, nil)
+	err = Req(m.cl, m.s, m.host, a, &resp)
+	return
 }
 
 // NewMessager returns a *Messager with the underlying

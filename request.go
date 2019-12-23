@@ -9,9 +9,14 @@ import (
 // HandleResp reads the raw HTTP response and checks if
 // any error returned. Errors other than io/json error
 // should be a CanonicalizedError. The body is unmarshaled
-// to the provided interface resp if the request succeeds.
+// to the provided interface resp using the function f.
+// If f is nil, it defaults to json.Unmarshal.
 // It is the caller's responsibility to close the body.
-func HandleResp(raw *http.Response, resp interface{}) (err error) {
+func HandleResp(raw *http.Response, f func([]byte, interface{}) error, resp interface{}) (err error) {
+	if f == nil {
+		f = json.Unmarshal // default
+	}
+
 	bs, err := ioutil.ReadAll(raw.Body)
 	if err != nil {
 		return
@@ -19,18 +24,20 @@ func HandleResp(raw *http.Response, resp interface{}) (err error) {
 
 	// try error first
 	var ce CanonicalizedError
-	err = json.Unmarshal(bs, &ce)
+	err = f(bs, &ce)
 	if err != nil {
 		return
 	}
 
 	ce.Status = raw.StatusCode
 
+	// TODO: check status also?
+	// if ce.Code != "" || ce.Status < 200 || ce.Status > 299 {
 	if ce.Code != "" { // if there's an error, there should be a code
 		return &ce
 	}
 
-	err = json.Unmarshal(bs, resp)
+	err = f(bs, resp)
 	return
 }
 
@@ -40,11 +47,10 @@ func HandleResp(raw *http.Response, resp interface{}) (err error) {
 func Get(cl *http.Client, s Signer, a API, host string, resp interface{}) error {
 	url := host + "?" + s.Sign(a)
 	r, err := cl.Get(url)
-	if r != nil && r.Body != nil {
-		defer r.Body.Close()
-	}
 	if err != nil {
 		return err
 	}
-	return HandleResp(r, resp)
+	defer r.Body.Close()
+
+	return HandleResp(r, json.Unmarshal, resp)
 }

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/practigo/aliyun"
 )
 
 // A SendMessageRequest is the request body for API
@@ -162,11 +164,8 @@ func NewMessager(s Signer, host string) *Messager {
 	return &Messager{
 		s:    s,
 		host: host,
-		cl: &http.Client{
-			Timeout: 5 * time.Second,
-		},
-		poller: &http.Client{
-			Timeout: 35 * time.Second,
-		},
+		// default clients
+		cl:     aliyun.TimeoutClient(5 * time.Second),
+		poller: aliyun.TimeoutClient(35 * time.Second),
 	}
 }

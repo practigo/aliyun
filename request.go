@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 // HandleResp reads the raw HTTP response and checks if
@@ -53,4 +54,11 @@ func Get(cl *http.Client, s Signer, a API, host string, resp interface{}) error 
 	defer r.Body.Close()
 
 	return HandleResp(r, json.Unmarshal, resp)
+}
+
+// TimeoutClient returns a http.Client with timeout set.
+// Set timeout longer than the max wait time for long
+// polling requests.
+func TimeoutClient(d time.Duration) *http.Client {
+	return &http.Client{Timeout: d}
 }

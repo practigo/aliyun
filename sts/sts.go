@@ -118,8 +118,6 @@ func New(s aliyun.Signer, host string) Getter {
 	return &getter{
 		s:    s,
 		host: host,
-		cl: &http.Client{
-			Timeout: 5 * time.Second,
-		},
+		cl:   aliyun.TimeoutClient(5 * time.Second),
 	}
 }

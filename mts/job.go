@@ -172,8 +172,6 @@ func New(s aliyun.Signer, host string) Transcoder {
 	return &transcoder{
 		signer: s,
 		host:   host,
-		cl: &http.Client{
-			Timeout: 10 * time.Second,
-		},
+		cl:     aliyun.TimeoutClient(10 * time.Second),
 	}
 }

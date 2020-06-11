@@ -26,20 +26,18 @@ func HandleResp(raw *http.Response, f func([]byte, interface{}) error, resp inte
 	// try error first
 	var ce CanonicalizedError
 	err = f(bs, &ce)
-	if err != nil {
-		return
-	}
-
-	ce.Status = raw.StatusCode
-
-	// TODO: check status also?
-	// if ce.Code != "" || ce.Status < 200 || ce.Status > 299 {
-	if ce.Code != "" { // if there's an error, there should be a code
+	if err == nil && ce.Code != "" { // if there's an error, there should be a code
+		ce.Status = raw.StatusCode
 		return &ce
 	}
+	// else fail to unmarshal to an error
+	// err = nil
 
-	err = f(bs, resp)
-	return
+	if resp != nil {
+		return f(bs, resp)
+	}
+
+	return nil
 }
 
 // Get makes a HTTP GET request to the host

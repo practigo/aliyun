@@ -99,6 +99,8 @@ type Messager struct {
 
 // Send sends a message to the queue. See
 // https://help.aliyun.com/document_detail/35134.html.
+// Note that priority is not guaranteed, see
+// https://help.aliyun.com/knowledge_detail/39216.html.
 func (m *Messager) Send(queue string, msg *SendMessageRequest) (resp SendMessageResponse, err error) {
 	a := &API{
 		Method:   http.MethodPost,

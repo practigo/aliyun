@@ -165,6 +165,14 @@ func (m *Messager) Change(queue, receipt string, timeout int) (resp ChangeMessag
 	return
 }
 
+// Attribute lists the attributes of the queue. See
+// https://help.aliyun.com/document_detail/35131.html.
+func (m *Messager) Attribute(queue string) (resp QueueAttributes, err error) {
+	a := GetQueueAttributes(queue)
+	err = Req(m.cl, m.s, m.host, a, &resp)
+	return
+}
+
 // NewMessager returns a *Messager with the underlying
 // http.Clients set to 35s for long-polling receiving
 // and 5s for other requests.

@@ -88,6 +88,12 @@ func Encode2Base64(src []byte) []byte {
 	return buf
 }
 
+// DecodeFromBase64 decodes the src base64 bytes to normal bytes.
+// It is the reverse of Encode2Base64.
+func DecodeFromBase64(src []byte) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(string(src))
+}
+
 // A Messager provides operations on the messages on
 // queues of a certain host.
 type Messager struct {

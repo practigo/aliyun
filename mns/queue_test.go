@@ -1,7 +1,6 @@
 package mns_test
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"testing"
 	"time"
@@ -46,7 +45,8 @@ func TestMessager(t *testing.T) {
 	} else {
 		bs, _ := json.Marshal(resp2)
 		t.Log(string(bs))
-		body, _ := base64.StdEncoding.DecodeString(string(resp2.MessageBody))
+		body, _ := mns.DecodeFromBase64(resp2.MessageBody)
+		// body, _ := base64.StdEncoding.DecodeString(string(resp2.MessageBody))
 		t.Log(string(body))
 
 		// delete
@@ -56,5 +56,18 @@ func TestMessager(t *testing.T) {
 		} else {
 			t.Log(resp2.ReceiptHandle, "deleted")
 		}
+	}
+}
+
+func TestEncode(t *testing.T) {
+	src := []byte("hello world of base64")
+	encoded := mns.Encode2Base64(src)
+	t.Log(string(encoded))
+	dst, err := mns.DecodeFromBase64(encoded)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(dst) != string(src) {
+		t.Error("encode decode mismatch")
 	}
 }

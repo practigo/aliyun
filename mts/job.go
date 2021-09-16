@@ -2,7 +2,6 @@ package mts
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -72,37 +71,41 @@ func QueryJobsAPI(id string, rest ...string) aliyun.API {
 	ids := append(rest, id)
 	a.v.Add("JobIds", strings.Join(ids, ","))
 
-	fmt.Println(a.v.Encode())
+	// fmt.Println(a.v.Encode())
 	return a
 }
 
+// JobIO is the job input/output.
+type JobIO struct {
+	Bucket   string `json:"Bucket"`
+	Location string `json:"Location"`
+	Object   string `json:"Object"`
+}
+
 // A JobInfo represents the info for one job.
-// The WaterMarkList & Properties have too many
-// fields so it's marshalled to raw bytes.
+// The Output has too many fields so it's marshalled to raw bytes.
 type JobInfo struct {
-	JobID string `json:"JobId"`
-	Input struct {
-		Bucket   string `json:"Bucket"`
-		Location string `json:"Location"`
-		Object   string `json:"Object"`
-	} `json:"Input"`
-	Output struct {
-		OutputFile struct {
-			Bucket   string `json:"Bucket"`
-			Location string `json:"Location"`
-			Object   string `json:"Object"`
-		} `json:"OutputFile"`
-		TemplateID    string          `json:"TemplateId"`
-		WaterMarkList json.RawMessage `json:"WaterMarkList,omitempty"` // it's too much
-		Properties    json.RawMessage `json:"Properties,omitempty"`    // it's too much
-		UserData      string          `json:"UserData"`
-	} `json:"Output"`
-	State        string    `json:"State"`
-	Code         string    `json:"Code"`
-	Message      string    `json:"Message"`
-	Percent      int       `json:"Percent"`
-	PipelineID   string    `json:"PipelineId"`
-	CreationTime time.Time `json:"CreationTime"`
+	JobID        string          `json:"JobId"`
+	Input        JobIO           `json:"Input"`
+	Output       json.RawMessage `json:"Output"`
+	State        string          `json:"State"`
+	Code         string          `json:"Code"`
+	Message      string          `json:"Message"`
+	Percent      int             `json:"Percent"`
+	PipelineID   string          `json:"PipelineId"`
+	CreationTime time.Time       `json:"CreationTime"`
+	FinishTime   time.Time       `json:"FinishTime"`
+}
+
+// JobOutputInfo is a mapping for JobInfo.Output.
+// This is NOT mean to be completed.
+type JobOutputInfo struct {
+	OutputFile JobIO           `json:"OutputFile"`
+	UserData   string          `json:"UserData"`
+	Priority   string          `json:"Priority"`
+	Properties json.RawMessage `json:"Properties"`
+	ExtendData string          `json:"ExtendData"`
+	TemplateID string          `json:"TemplateId"`
 }
 
 // A JobResult gives the result of a job.

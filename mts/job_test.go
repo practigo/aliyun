@@ -13,6 +13,8 @@ var (
 	testEnvs     = make(map[string]string)
 	requiredVars = []string{"MTS_KEY_ID", "MTS_KEY_SECRET", "MTS_ENDPOINT"}
 	completed    = true
+
+	tr mts.Transcoder
 )
 
 func TestMain(m *testing.M) {
@@ -24,16 +26,17 @@ func TestMain(m *testing.M) {
 			break
 		}
 	}
+
+	s := aliyun.NewAccessKey(testEnvs["MTS_KEY_ID"], testEnvs["MTS_KEY_SECRET"])
+	tr = mts.New(s, testEnvs["MTS_ENDPOINT"])
+
 	os.Exit(m.Run())
 }
 
-func TestTranscoder(t *testing.T) {
+func TestSubmit(t *testing.T) {
 	if !completed {
 		t.Skip("Must set env vars", requiredVars)
 	}
-
-	s := aliyun.NewAccessKey(testEnvs["MTS_KEY_ID"], testEnvs["MTS_KEY_SECRET"])
-	submitter := mts.New(s, testEnvs["MTS_ENDPOINT"])
 
 	// CHANGE the request to make it non-error.
 	// Dummy example from official doc.
@@ -44,19 +47,25 @@ func TestTranscoder(t *testing.T) {
 		OutputLocation: "oss-cn-shanghai",
 		PipelineID:     "example-pipeline",
 	}
-	resp, err := submitter.Submit(&req)
+	resp, err := tr.Submit(&req)
 	if err != nil {
 		t.Log(err)
 	} else {
 		t.Logf("%+v", resp)
 	}
+}
+
+func TestQuery(t *testing.T) {
+	if !completed {
+		t.Skip("Must set env vars", requiredVars)
+	}
 
 	// CHANGE the request to make it non-error.
-	resp2, err := submitter.Query("example-jobid1", "example-jobid2")
+	resp2, err := tr.Query("example-jobid1", "example-jobid2")
 	if err != nil {
 		t.Log(err)
 	} else {
-		bs, _ := json.Marshal(resp2)
+		bs, _ := json.MarshalIndent(resp2, "", "  ")
 		t.Log(string(bs))
 	}
 }

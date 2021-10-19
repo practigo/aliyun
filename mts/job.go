@@ -38,6 +38,7 @@ type SubmitJobsRequest struct {
 	OutputLocation string `json:"OutputLocation"`
 	Outputs        string `json:"Outputs"`
 	PipelineID     string `json:"PipelineId"`
+	RegionID       string `json:"RegionId"`
 }
 
 // SubmitJobsAPI returns a API for SubmitJobs.
@@ -51,10 +52,11 @@ func SubmitJobsAPI(r *SubmitJobsRequest) aliyun.API {
 	a.v.Add("OutputBucket", r.OutputBucket)
 	a.v.Add("Outputs", r.Outputs)
 	a.v.Add("PipelineId", r.PipelineID)
+	a.v.Add("OutputLocation", r.OutputLocation)
 
 	// optional
-	if r.OutputLocation != "" {
-		a.v.Add("OutputLocation", r.OutputLocation)
+	if r.RegionID != "" {
+		a.v.Add("RegionId", r.RegionID)
 	}
 
 	return a
